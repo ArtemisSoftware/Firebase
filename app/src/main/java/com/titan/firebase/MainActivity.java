@@ -15,7 +15,10 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private DocumentReference noteRef = db.document("Notebook/My First Note");
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +52,34 @@ public class MainActivity extends AppCompatActivity {
         ((Button)findViewById(R.id.btn_load_note)).setOnClickListener(btn_load_note__OnClickListener);
 
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        Timber.d("onStart...");
+
+        noteRef.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
+                if (e != null) {
+
+                    Toast.makeText(MainActivity.this, "Error while loading!", Toast.LENGTH_SHORT).show();
+                    Timber.e("Error while loading: " + e.toString());
+                    return;
+                }
+
+                if (documentSnapshot.exists()) {
+                    String title = documentSnapshot.getString(KEY_TITLE);
+                    String description = documentSnapshot.getString(KEY_DESCRIPTION);
+
+                    Timber.d("Loaded document");
+                    textViewData.setText("Title: " + title + "\n" + "Description: " + description);
+                }
+            }
+        });
+    }
+
 
     public void saveNote(View v) {
 
