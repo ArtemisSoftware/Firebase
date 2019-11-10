@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -20,6 +21,8 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.titan.firebase.models.Note;
 
 import java.util.HashMap;
@@ -38,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView textViewData;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private CollectionReference notebookRef = db.collection("Notebook");
     private DocumentReference noteRef = db.document("Notebook/My First Note");
 
 
@@ -50,11 +54,14 @@ public class MainActivity extends AppCompatActivity {
         editTextDescription = findViewById(R.id.edit_text_description);
         textViewData = findViewById(R.id.text_view_data);
 
-        ((Button)findViewById(R.id.btn_save_note)).setOnClickListener(btn_save_note__OnClickListener);
-        ((Button)findViewById(R.id.btn_load_note)).setOnClickListener(btn_load_note__OnClickListener);
-        ((Button)findViewById(R.id.btn_update_description)).setOnClickListener(btn_update_description__OnClickListener);
-        ((Button)findViewById(R.id.btn_delete_description)).setOnClickListener(btn_delete_description__OnClickListener);
-        ((Button)findViewById(R.id.btn_delete_note)).setOnClickListener(btn_delete_note__OnClickListener);
+        //((Button)findViewById(R.id.btn_save_note)).setOnClickListener(btn_save_note__OnClickListener);
+        //((Button)findViewById(R.id.btn_load_note)).setOnClickListener(btn_load_note__OnClickListener);
+        //((Button)findViewById(R.id.btn_update_description)).setOnClickListener(btn_update_description__OnClickListener);
+        //((Button)findViewById(R.id.btn_delete_description)).setOnClickListener(btn_delete_description__OnClickListener);
+        //((Button)findViewById(R.id.btn_delete_note)).setOnClickListener(btn_delete_note__OnClickListener);
+
+        ((Button)findViewById(R.id.btn_add_note)).setOnClickListener(btn_add_note__OnClickListener);
+        ((Button)findViewById(R.id.btn_load_notes)).setOnClickListener(btn_load_notes__OnClickListener);
 
     }
 
@@ -62,31 +69,81 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+
         Timber.d("onStart...");
 
-        noteRef.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
+        notebookRef.addSnapshotListener(this, new EventListener<QuerySnapshot>() {
             @Override
-            public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
+            public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
                 if (e != null) {
 
-                    Toast.makeText(MainActivity.this, "Error while loading!", Toast.LENGTH_SHORT).show();
-                    Timber.e("Error while loading: " + e.toString());
+                    Timber.e("FirebaseFirestoreException:" + e.toString());
                     return;
                 }
 
-                if (documentSnapshot.exists()) {
+                String data = "";
 
+                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                     Note note = documentSnapshot.toObject(Note.class);
-                    textViewData.setText("Title: " + note.getTitle() + "\n" + "Description: " + note.getDescription());
+                    note.setDocumentId(documentSnapshot.getId());
 
-                    Timber.d("Loaded document");
+
+                    data += "ID: " + note.getDocumentId()
+                            + "\nTitle: " + note.getTitle() + "\nDescription: " + note.getDescription() + "\n\n";
                 }
-                else{
-                    textViewData.setText("");
-                }
+
+                Timber.d("Loaded onStart");
+
+                textViewData.setText(data);
             }
         });
     }
+
+
+
+    public void addNote(View v) {
+
+        Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString());
+        notebookRef.add(note)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Toast.makeText(getApplicationContext(), "Note saved", Toast.LENGTH_SHORT).show();
+                        Timber.d("Note saved: " + documentReference);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                        Toast.makeText(MainActivity.this, "Error!", Toast.LENGTH_SHORT).show();
+                        Timber.e("Failure error: " + e.toString());
+                    }
+                });
+    }
+
+    public void loadNotes(View v) {
+        notebookRef.get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        String data = "";
+
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            Note note = documentSnapshot.toObject(Note.class);
+
+                            note.setDocumentId(documentSnapshot.getId());
+
+                            data += "ID: " + note.getDocumentId()
+                                    + "\nTitle: " + note.getTitle() + "\nDescription: " + note.getDescription() + "\n\n";
+                        }
+
+                        textViewData.setText(data);
+                    }
+                });
+    }
+
+
 
 
     public void saveNote(View v) {
@@ -208,6 +265,24 @@ public class MainActivity extends AppCompatActivity {
 
             Timber.d("Deleting note...");
             deleteNote(v);
+        }
+    };
+
+    Button.OnClickListener btn_add_note__OnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            Timber.d("Adding note...");
+            addNote(v);
+        }
+    };
+
+    Button.OnClickListener btn_load_notes__OnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            Timber.d("Loading note...");
+            loadNotes(v);
         }
     };
 
