@@ -20,6 +20,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.titan.firebase.models.Note;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -74,11 +75,11 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 if (documentSnapshot.exists()) {
-                    String title = documentSnapshot.getString(KEY_TITLE);
-                    String description = documentSnapshot.getString(KEY_DESCRIPTION);
+
+                    Note note = documentSnapshot.toObject(Note.class);
+                    textViewData.setText("Title: " + note.getTitle() + "\n" + "Description: " + note.getDescription());
 
                     Timber.d("Loaded document");
-                    textViewData.setText("Title: " + title + "\n" + "Description: " + description);
                 }
                 else{
                     textViewData.setText("");
@@ -90,12 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void saveNote(View v) {
 
-        String title = editTextTitle.getText().toString();
-        String description = editTextDescription.getText().toString();
-
-        Map<String, Object> note = new HashMap<>();
-        note.put(KEY_TITLE, title);
-        note.put(KEY_DESCRIPTION, description);
+        Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString());
 
         db.collection("Notebook").document("My First Note").set(note)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -123,12 +119,10 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         if (documentSnapshot.exists()) {
-                            String title = documentSnapshot.getString(KEY_TITLE);
-                            String description = documentSnapshot.getString(KEY_DESCRIPTION);
 
-                            //Map<String, Object> note = documentSnapshot.getData();
+                            Note note = documentSnapshot.toObject(Note.class);
 
-                            textViewData.setText("Title: " + title + "\n" + "Description: " + description);
+                            textViewData.setText("Title: " + note.getTitle() + "\n" + "Description: " + note.getDescription());
                             Timber.d("Received: " + documentSnapshot);
                         } else {
                             Toast.makeText(MainActivity.this, "Document does not exist", Toast.LENGTH_SHORT).show();
