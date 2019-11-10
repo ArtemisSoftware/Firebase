@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
         ((Button)findViewById(R.id.btn_save_note)).setOnClickListener(btn_save_note__OnClickListener);
         ((Button)findViewById(R.id.btn_load_note)).setOnClickListener(btn_load_note__OnClickListener);
+        ((Button)findViewById(R.id.btn_update_description)).setOnClickListener(btn_update_description__OnClickListener);
 
     }
 
@@ -155,5 +156,24 @@ public class MainActivity extends AppCompatActivity {
             loadNote(v);
         }
     };
+
+    Button.OnClickListener btn_update_description__OnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            Timber.d("Updating note...");
+            updateDescription(v);
+        }
+    };
+
+    public void updateDescription(View v) {
+        String description = editTextDescription.getText().toString();
+
+        //Map<String, Object> note = new HashMap<>();
+        //note.put(KEY_DESCRIPTION, description);
+        //noteRef.set(note, SetOptions.merge());
+
+        noteRef.update(KEY_DESCRIPTION, description);
+    }
 
 }
