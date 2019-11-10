@@ -16,6 +16,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -51,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
         ((Button)findViewById(R.id.btn_save_note)).setOnClickListener(btn_save_note__OnClickListener);
         ((Button)findViewById(R.id.btn_load_note)).setOnClickListener(btn_load_note__OnClickListener);
         ((Button)findViewById(R.id.btn_update_description)).setOnClickListener(btn_update_description__OnClickListener);
+        ((Button)findViewById(R.id.btn_delete_description)).setOnClickListener(btn_delete_description__OnClickListener);
+        ((Button)findViewById(R.id.btn_delete_note)).setOnClickListener(btn_delete_note__OnClickListener);
 
     }
 
@@ -76,6 +79,9 @@ public class MainActivity extends AppCompatActivity {
 
                     Timber.d("Loaded document");
                     textViewData.setText("Title: " + title + "\n" + "Description: " + description);
+                }
+                else{
+                    textViewData.setText("");
                 }
             }
         });
@@ -139,6 +145,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void updateDescription(View v) {
+        String description = editTextDescription.getText().toString();
+
+        //Map<String, Object> note = new HashMap<>();
+        //note.put(KEY_DESCRIPTION, description);
+        //noteRef.set(note, SetOptions.merge());
+
+        noteRef.update(KEY_DESCRIPTION, description);
+    }
+
+
+    public void deleteDescription(View v) {
+        //Map<String, Object> note = new HashMap<>();
+        //note.put(KEY_DESCRIPTION, FieldValue.delete());
+        //noteRef.update(note);
+
+        noteRef.update(KEY_DESCRIPTION, FieldValue.delete());
+    }
+
+    public void deleteNote(View v) {
+        noteRef.delete();
+    }
+
+
+
+
+
     Button.OnClickListener btn_save_note__OnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -161,19 +194,27 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
 
-            Timber.d("Updating note...");
+            Timber.d("Updating description...");
             updateDescription(v);
         }
     };
 
-    public void updateDescription(View v) {
-        String description = editTextDescription.getText().toString();
+    Button.OnClickListener btn_delete_description__OnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
 
-        //Map<String, Object> note = new HashMap<>();
-        //note.put(KEY_DESCRIPTION, description);
-        //noteRef.set(note, SetOptions.merge());
+            Timber.d("Deleting description...");
+            deleteDescription(v);
+        }
+    };
 
-        noteRef.update(KEY_DESCRIPTION, description);
-    }
+    Button.OnClickListener btn_delete_note__OnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            Timber.d("Deleting note...");
+            deleteNote(v);
+        }
+    };
 
 }
