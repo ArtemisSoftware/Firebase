@@ -13,14 +13,23 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.titan.firebase.models.Note;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import timber.log.Timber;
@@ -33,10 +42,14 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText editTextTitle;
     private EditText editTextDescription;
+    private EditText editTextPriority;
     private TextView textViewData;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private CollectionReference notebookRef = db.collection("Notebook");
     private DocumentReference noteRef = db.document("Notebook/My First Note");
+
+    private DocumentSnapshot lastResult;
 
 
     @Override
@@ -47,9 +60,16 @@ public class MainActivity extends AppCompatActivity {
         editTextTitle = findViewById(R.id.edit_text_title);
         editTextDescription = findViewById(R.id.edit_text_description);
         textViewData = findViewById(R.id.text_view_data);
+        editTextPriority = findViewById(R.id.edit_text_priority);
 
-        ((Button)findViewById(R.id.btn_save_note)).setOnClickListener(btn_save_note__OnClickListener);
-        ((Button)findViewById(R.id.btn_load_note)).setOnClickListener(btn_load_note__OnClickListener);
+        //((Button)findViewById(R.id.btn_save_note)).setOnClickListener(btn_save_note__OnClickListener);
+        //((Button)findViewById(R.id.btn_load_note)).setOnClickListener(btn_load_note__OnClickListener);
+        //((Button)findViewById(R.id.btn_update_description)).setOnClickListener(btn_update_description__OnClickListener);
+        //((Button)findViewById(R.id.btn_delete_description)).setOnClickListener(btn_delete_description__OnClickListener);
+        //((Button)findViewById(R.id.btn_delete_note)).setOnClickListener(btn_delete_note__OnClickListener);
+
+        ((Button)findViewById(R.id.btn_add_note)).setOnClickListener(btn_add_note__OnClickListener);
+        ((Button)findViewById(R.id.btn_load_notes)).setOnClickListener(btn_load_notes__OnClickListener);
 
     }
 
@@ -57,38 +77,119 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+/*
         Timber.d("onStart...");
 
-        noteRef.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
+        notebookRef.addSnapshotListener(this, new EventListener<QuerySnapshot>() {
             @Override
-            public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
+            public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
                 if (e != null) {
 
-                    Toast.makeText(MainActivity.this, "Error while loading!", Toast.LENGTH_SHORT).show();
-                    Timber.e("Error while loading: " + e.toString());
+                    Timber.e("FirebaseFirestoreException:" + e.toString());
                     return;
                 }
 
-                if (documentSnapshot.exists()) {
-                    String title = documentSnapshot.getString(KEY_TITLE);
-                    String description = documentSnapshot.getString(KEY_DESCRIPTION);
+                String data = "";
 
-                    Timber.d("Loaded document");
-                    textViewData.setText("Title: " + title + "\n" + "Description: " + description);
+                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                    Note note = documentSnapshot.toObject(Note.class);
+                    note.setDocumentId(documentSnapshot.getId());
+
+
+                    data += "ID: " + note.getDocumentId()
+                            + "\nTitle: " + note.getTitle() + "\nDescription: " + note.getDescription() + "\nPriority: " + note.getPriority() + "\n\n";
                 }
+
+                Timber.d("Loaded onStart");
+
+                textViewData.setText(data);
             }
         });
+        */
     }
+
+
+
+    public void addNote(View v) {
+
+        if (editTextPriority.length() == 0) {
+            editTextPriority.setText("0");
+        }
+
+        int priority = Integer.parseInt(editTextPriority.getText().toString());
+
+        Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString(), priority);
+
+        notebookRef.add(note)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Toast.makeText(getApplicationContext(), "Note saved", Toast.LENGTH_SHORT).show();
+                        Timber.d("Note saved: " + documentReference);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                        Toast.makeText(MainActivity.this, "Error!", Toast.LENGTH_SHORT).show();
+                        Timber.e("Failure error: " + e.toString());
+                    }
+                });
+    }
+
+    public void loadNotes(View v) {
+
+        Query query;
+
+        if(lastResult == null){
+            query = notebookRef.orderBy("priority")
+                    .limit(3);
+        }
+        else {
+            query = notebookRef.orderBy("priority")
+                    .startAfter(lastResult)
+                    .limit(3);
+        }
+
+        query.get()
+            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    String data = "";
+
+                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        Note note = documentSnapshot.toObject(Note.class);
+                        note.setDocumentId(documentSnapshot.getId());
+
+                        data += "ID: " + note.getDocumentId()
+                                + "\nTitle: " + note.getTitle() + "\nDescription: " + note.getDescription()
+                                + "\nPriority: " + note.getPriority() + "\n\n";
+                    }
+
+                    if (queryDocumentSnapshots.size() > 0) {
+                        data += "___________\n\n";
+                        textViewData.append(data);
+
+                        lastResult = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
+                    }
+                }
+            });
+    }
+
+
 
 
     public void saveNote(View v) {
 
-        String title = editTextTitle.getText().toString();
-        String description = editTextDescription.getText().toString();
+        if (editTextPriority.length() == 0) {
+            editTextPriority.setText("0");
+        }
 
-        Map<String, Object> note = new HashMap<>();
-        note.put(KEY_TITLE, title);
-        note.put(KEY_DESCRIPTION, description);
+        int priority = Integer.parseInt(editTextPriority.getText().toString());
+
+        Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString(), priority);
+
 
         db.collection("Notebook").document("My First Note").set(note)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -116,12 +217,10 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         if (documentSnapshot.exists()) {
-                            String title = documentSnapshot.getString(KEY_TITLE);
-                            String description = documentSnapshot.getString(KEY_DESCRIPTION);
 
-                            //Map<String, Object> note = documentSnapshot.getData();
+                            Note note = documentSnapshot.toObject(Note.class);
 
-                            textViewData.setText("Title: " + title + "\n" + "Description: " + description);
+                            textViewData.setText("Title: " + note.getTitle() + "\n" + "Description: " + note.getDescription());
                             Timber.d("Received: " + documentSnapshot);
                         } else {
                             Toast.makeText(MainActivity.this, "Document does not exist", Toast.LENGTH_SHORT).show();
@@ -136,6 +235,33 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+
+
+    public void updateDescription(View v) {
+        String description = editTextDescription.getText().toString();
+
+        //Map<String, Object> note = new HashMap<>();
+        //note.put(KEY_DESCRIPTION, description);
+        //noteRef.set(note, SetOptions.merge());
+
+        noteRef.update(KEY_DESCRIPTION, description);
+    }
+
+
+    public void deleteDescription(View v) {
+        //Map<String, Object> note = new HashMap<>();
+        //note.put(KEY_DESCRIPTION, FieldValue.delete());
+        //noteRef.update(note);
+
+        noteRef.update(KEY_DESCRIPTION, FieldValue.delete());
+    }
+
+    public void deleteNote(View v) {
+        noteRef.delete();
+    }
+
+
+
 
 
     Button.OnClickListener btn_save_note__OnClickListener = new View.OnClickListener() {
@@ -153,6 +279,51 @@ public class MainActivity extends AppCompatActivity {
 
             Timber.d("Loading note...");
             loadNote(v);
+        }
+    };
+
+    Button.OnClickListener btn_update_description__OnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            Timber.d("Updating description...");
+            updateDescription(v);
+        }
+    };
+
+    Button.OnClickListener btn_delete_description__OnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            Timber.d("Deleting description...");
+            deleteDescription(v);
+        }
+    };
+
+    Button.OnClickListener btn_delete_note__OnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            Timber.d("Deleting note...");
+            deleteNote(v);
+        }
+    };
+
+    Button.OnClickListener btn_add_note__OnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            Timber.d("Adding note...");
+            addNote(v);
+        }
+    };
+
+    Button.OnClickListener btn_load_notes__OnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            Timber.d("Loading note...");
+            loadNotes(v);
         }
     };
 
