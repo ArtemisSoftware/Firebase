@@ -49,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
     private CollectionReference notebookRef = db.collection("Notebook");
     private DocumentReference noteRef = db.document("Notebook/My First Note");
 
+    private DocumentSnapshot lastResult;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-
+/*
         Timber.d("onStart...");
 
         notebookRef.addSnapshotListener(this, new EventListener<QuerySnapshot>() {
@@ -103,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 textViewData.setText(data);
             }
         });
+        */
     }
 
 
@@ -136,40 +139,42 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadNotes(View v) {
-        Task<QuerySnapshot> task1 = notebookRef.whereLessThan("priority", 3)
-                .orderBy("priority")
-                .get();
 
-        Task<QuerySnapshot> task2 = notebookRef.whereGreaterThan("priority", 3)
-                .orderBy("priority")
-                .get();
+        Query query;
 
-        Task<List<QuerySnapshot>> allTasks = Tasks.whenAllSuccess(task1, task2);
+        if(lastResult == null){
+            query = notebookRef.orderBy("priority")
+                    .limit(3);
+        }
+        else {
+            query = notebookRef.orderBy("priority")
+                    .startAfter(lastResult)
+                    .limit(3);
+        }
 
-        allTasks.addOnSuccessListener(new OnSuccessListener<List<QuerySnapshot>>() {
-            @Override
-            public void onSuccess(List<QuerySnapshot> querySnapshots) {
-                String data = "";
+        query.get()
+            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    String data = "";
 
-                for (QuerySnapshot queryDocumentSnapshots : querySnapshots) {
                     for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                         Note note = documentSnapshot.toObject(Note.class);
                         note.setDocumentId(documentSnapshot.getId());
-
-                        String documentId = note.getDocumentId();
-                        String title = note.getTitle();
-                        String description = note.getDescription();
-                        int priority = note.getPriority();
 
                         data += "ID: " + note.getDocumentId()
                                 + "\nTitle: " + note.getTitle() + "\nDescription: " + note.getDescription()
                                 + "\nPriority: " + note.getPriority() + "\n\n";
                     }
-                }
 
-                textViewData.setText(data);
-            }
-        });
+                    if (queryDocumentSnapshots.size() > 0) {
+                        data += "___________\n\n";
+                        textViewData.append(data);
+
+                        lastResult = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
+                    }
+                }
+            });
     }
 
 
