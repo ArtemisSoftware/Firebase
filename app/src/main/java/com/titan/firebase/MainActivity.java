@@ -21,6 +21,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.titan.firebase.models.Note;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText editTextTitle;
     private EditText editTextDescription;
+    private EditText editTextPriority;
     private TextView textViewData;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         editTextTitle = findViewById(R.id.edit_text_title);
         editTextDescription = findViewById(R.id.edit_text_description);
         textViewData = findViewById(R.id.text_view_data);
+        editTextPriority = findViewById(R.id.edit_text_priority);
 
         //((Button)findViewById(R.id.btn_save_note)).setOnClickListener(btn_save_note__OnClickListener);
         //((Button)findViewById(R.id.btn_load_note)).setOnClickListener(btn_load_note__OnClickListener);
@@ -89,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                     data += "ID: " + note.getDocumentId()
-                            + "\nTitle: " + note.getTitle() + "\nDescription: " + note.getDescription() + "\n\n";
+                            + "\nTitle: " + note.getTitle() + "\nDescription: " + note.getDescription() + "\nPriority: " + note.getPriority() + "\n\n";
                 }
 
                 Timber.d("Loaded onStart");
@@ -103,7 +106,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void addNote(View v) {
 
-        Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString());
+        if (editTextPriority.length() == 0) {
+            editTextPriority.setText("0");
+        }
+
+        int priority = Integer.parseInt(editTextPriority.getText().toString());
+
+        Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString(), priority);
+
         notebookRef.add(note)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
@@ -123,7 +133,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadNotes(View v) {
-        notebookRef.get()
+        notebookRef.whereGreaterThanOrEqualTo("priority", 3)
+                .orderBy("priority", Query.Direction.DESCENDING)
+                .limit(1)
+                .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -135,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                             note.setDocumentId(documentSnapshot.getId());
 
                             data += "ID: " + note.getDocumentId()
-                                    + "\nTitle: " + note.getTitle() + "\nDescription: " + note.getDescription() + "\n\n";
+                                    + "\nTitle: " + note.getTitle() + "\nDescription: " + note.getDescription() + "\nPriority: " + note.getPriority() + "\n\n";
                         }
 
                         textViewData.setText(data);
@@ -148,7 +161,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void saveNote(View v) {
 
-        Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString());
+        if (editTextPriority.length() == 0) {
+            editTextPriority.setText("0");
+        }
+
+        int priority = Integer.parseInt(editTextPriority.getText().toString());
+
+        Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString(), priority);
+
 
         db.collection("Notebook").document("My First Note").set(note)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
