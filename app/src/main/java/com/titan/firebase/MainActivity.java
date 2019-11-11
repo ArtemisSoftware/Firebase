@@ -134,8 +134,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void loadNotes(View v) {
         notebookRef.whereGreaterThanOrEqualTo("priority", 3)
-                .orderBy("priority", Query.Direction.DESCENDING)
-                .limit(1)
+                .orderBy("priority")
+                .orderBy("title")
+                //.whereEqualTo("title", "José ")
+                //.orderBy("priority", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -152,6 +154,12 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         textViewData.setText(data);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Timber.e("Failure error: " + e.toString());
                     }
                 });
     }
