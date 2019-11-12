@@ -16,6 +16,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -77,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-/*
+
         Timber.d("onStart...");
 
         notebookRef.addSnapshotListener(this, new EventListener<QuerySnapshot>() {
@@ -89,23 +90,33 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                String data = "";
+                for(DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()){
+                    Note note = dc.getDocument().toObject(Note.class);
 
-                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    Note note = documentSnapshot.toObject(Note.class);
-                    note.setDocumentId(documentSnapshot.getId());
+                    note.setDocumentId(dc.getDocument().getId());
+                    int oldIndex = dc.getOldIndex();
+                    int newIndex = dc.getNewIndex();
 
-
-                    data += "ID: " + note.getDocumentId()
-                            + "\nTitle: " + note.getTitle() + "\nDescription: " + note.getDescription() + "\nPriority: " + note.getPriority() + "\n\n";
+                    switch (dc.getType()) {
+                        case ADDED:
+                            textViewData.append("\nAdded: " + note.getDocumentId() +
+                                    "\nOld Index: " + oldIndex + "  New Index: " + newIndex);
+                            break;
+                        case MODIFIED:
+                            textViewData.append("\nModified: " + note.getDocumentId() +
+                                    "\nOld Index: " + oldIndex + "  New Index: " + newIndex);
+                            break;
+                        case REMOVED:
+                            textViewData.append("\nRemoved: " + note.getDocumentId() +
+                                    "\nOld Index: " + oldIndex + "  New Index: " + newIndex);
+                            break;
+                    }
                 }
 
                 Timber.d("Loaded onStart");
-
-                textViewData.setText(data);
             }
         });
-        */
+
     }
 
 
