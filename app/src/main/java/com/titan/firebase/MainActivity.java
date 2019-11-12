@@ -140,9 +140,15 @@ public class MainActivity extends AppCompatActivity {
 
         int priority = Integer.parseInt(editTextPriority.getText().toString());
 
-        List <String> tagArray = Arrays.asList(edit_text_tags.getText().toString().split("\\s*,\\s*"));
+        String tagInput = edit_text_tags.getText().toString();
+        String[] tagArray = tagInput.split("\\s*,\\s*");
+        Map<String, Boolean> tags = new HashMap<>();
 
-        Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString(), priority, tagArray);
+        for (String tag : tagArray) {
+            tags.put(tag, true);
+        }
+
+        Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString(), priority, tags);
 
         notebookRef.add(note)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -164,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void loadNotes(View v) {
 
-        notebookRef.whereArrayContains("tags", "vão").get()
+        notebookRef.whereEqualTo("tags.tags ", true).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -177,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
                             data += "ID: " + note.getDocumentId();
 
                             try {
-                                for (String tag : note.getTags()) {
+                                for (String tag : note.getTags().keySet()) {
                                     data += "\n-" + tag;
                                 }
 
@@ -239,8 +245,14 @@ public class MainActivity extends AppCompatActivity {
 
         int priority = Integer.parseInt(editTextPriority.getText().toString());
 
-        List <String> tagArray = Arrays.asList(edit_text_tags.getText().toString().split("\\s*,\\s*"));
-        Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString(), priority, tagArray);
+        String tagInput = edit_text_tags.getText().toString();
+        String[] tagArray = tagInput.split("\\s*,\\s*");
+        Map<String, Boolean> tags = new HashMap<>();
+
+        for (String tag : tagArray) {
+            tags.put(tag, true);
+        }
+        Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString(), priority, tags);
 
 
         db.collection("Notebook").document("My First Note").set(note)
@@ -317,9 +329,16 @@ public class MainActivity extends AppCompatActivity {
 
         WriteBatch batch = db.batch();
 
-        List <String> tagArray = Arrays.asList(edit_text_tags.getText().toString().split("\\s*,\\s*"));
+        String tagInput = edit_text_tags.getText().toString();
+        String[] tagArray = tagInput.split("\\s*,\\s*");
+        Map<String, Boolean> tags = new HashMap<>();
+
+        for (String tag : tagArray) {
+            tags.put(tag, true);
+        }
+
         DocumentReference doc1 = notebookRef.document("New note");
-        batch.set(doc1, new Note("New Note", "New Note", 1, tagArray));
+        batch.set(doc1, new Note("New Note", "New Note", 1, tags));
 
         DocumentReference doc2 = notebookRef.document("8iULAw5yVBf9E3aV8LXu");
         batch.update(doc2, "title", "Updated note");
@@ -328,7 +347,7 @@ public class MainActivity extends AppCompatActivity {
         batch.delete(doc3);
 
         DocumentReference doc4 = notebookRef.document();
-        batch.set(doc4, new Note("Added Note", "Added Note", 1, tagArray));
+        batch.set(doc4, new Note("Added Note", "Added Note", 1, tags));
 
         batch.commit().addOnFailureListener(new OnFailureListener() {
             @Override
@@ -369,6 +388,9 @@ public class MainActivity extends AppCompatActivity {
        // notebookRef.document("RRHeKf3EzzTcwHhCCDyB")
          //       .update("tags", FieldValue.arrayUnion("new tag"));
                 //.update("tags", FieldValue.arrayRemove("new tag"));
+
+        //notebookRef.document("sQXCXVVqoUnHQ8zg4hC4")
+          //      .update("tags.tag1.nested1.nested2", true);
     }
 
 
