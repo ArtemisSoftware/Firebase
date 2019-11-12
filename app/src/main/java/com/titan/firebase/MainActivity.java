@@ -31,7 +31,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Transaction;
 import com.google.firebase.firestore.WriteBatch;
 import com.titan.firebase.models.Note;
-
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,13 +47,14 @@ public class MainActivity extends AppCompatActivity {
     private EditText editTextTitle;
     private EditText editTextDescription;
     private EditText editTextPriority;
+    private EditText edit_text_tags;
     private TextView textViewData;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference notebookRef = db.collection("Notebook");
     private DocumentReference noteRef = db.document("Notebook/My First Note");
 
-    private DocumentSnapshot lastResult;
+    //private DocumentSnapshot lastResult;
 
 
     @Override
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         editTextDescription = findViewById(R.id.edit_text_description);
         textViewData = findViewById(R.id.text_view_data);
         editTextPriority = findViewById(R.id.edit_text_priority);
+        edit_text_tags = findViewById(R.id.edit_text_tags);
 
         //((Button)findViewById(R.id.btn_save_note)).setOnClickListener(btn_save_note__OnClickListener);
         //((Button)findViewById(R.id.btn_load_note)).setOnClickListener(btn_load_note__OnClickListener);
@@ -77,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
 
         //executeBatchedWrite();
         executeTransaction();
+        updateArray();
     }
 
 
@@ -137,7 +140,9 @@ public class MainActivity extends AppCompatActivity {
 
         int priority = Integer.parseInt(editTextPriority.getText().toString());
 
-        Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString(), priority);
+        List <String> tagArray = Arrays.asList(edit_text_tags.getText().toString().split("\\s*,\\s*"));
+
+        Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString(), priority, tagArray);
 
         notebookRef.add(note)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -159,6 +164,32 @@ public class MainActivity extends AppCompatActivity {
 
     public void loadNotes(View v) {
 
+        notebookRef.whereArrayContains("tags", "vão").get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        String data = "";
+
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            Note note = documentSnapshot.toObject(Note.class);
+                            note.setDocumentId(documentSnapshot.getId());
+
+                            data += "ID: " + note.getDocumentId();
+
+                            try {
+                                for (String tag : note.getTags()) {
+                                    data += "\n-" + tag;
+                                }
+
+                                data += "\n\n";
+                            }
+                            catch (NullPointerException e){}
+                        }
+                        textViewData.setText(data);
+                    }
+                });
+
+        /*
         Query query;
 
         if(lastResult == null){
@@ -194,6 +225,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             });
+        */
     }
 
 
@@ -207,7 +239,8 @@ public class MainActivity extends AppCompatActivity {
 
         int priority = Integer.parseInt(editTextPriority.getText().toString());
 
-        Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString(), priority);
+        List <String> tagArray = Arrays.asList(edit_text_tags.getText().toString().split("\\s*,\\s*"));
+        Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString(), priority, tagArray);
 
 
         db.collection("Notebook").document("My First Note").set(note)
@@ -284,8 +317,9 @@ public class MainActivity extends AppCompatActivity {
 
         WriteBatch batch = db.batch();
 
+        List <String> tagArray = Arrays.asList(edit_text_tags.getText().toString().split("\\s*,\\s*"));
         DocumentReference doc1 = notebookRef.document("New note");
-        batch.set(doc1, new Note("New Note", "New Note", 1));
+        batch.set(doc1, new Note("New Note", "New Note", 1, tagArray));
 
         DocumentReference doc2 = notebookRef.document("8iULAw5yVBf9E3aV8LXu");
         batch.update(doc2, "title", "Updated note");
@@ -294,7 +328,7 @@ public class MainActivity extends AppCompatActivity {
         batch.delete(doc3);
 
         DocumentReference doc4 = notebookRef.document();
-        batch.set(doc4, new Note("Added Note", "Added Note", 1));
+        batch.set(doc4, new Note("Added Note", "Added Note", 1, tagArray));
 
         batch.commit().addOnFailureListener(new OnFailureListener() {
             @Override
@@ -308,6 +342,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void executeTransaction() {
+        /*
         db.runTransaction(new Transaction.Function<Long>() {
 
 
@@ -327,6 +362,13 @@ public class MainActivity extends AppCompatActivity {
                 Timber.d("New Priority: " + result);
             }
         });
+        */
+    }
+
+    private void updateArray() {
+       // notebookRef.document("RRHeKf3EzzTcwHhCCDyB")
+         //       .update("tags", FieldValue.arrayUnion("new tag"));
+                //.update("tags", FieldValue.arrayRemove("new tag"));
     }
 
 
