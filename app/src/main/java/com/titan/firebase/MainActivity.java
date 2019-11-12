@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
 
         //executeBatchedWrite();
         executeTransaction();
-        updateArray();
+
     }
 
 
@@ -150,6 +150,11 @@ public class MainActivity extends AppCompatActivity {
 
         Note note = new Note(editTextTitle.getText().toString(), editTextDescription.getText().toString(), priority, tags);
 
+
+        notebookRef.document("sQXCXVVqoUnHQ8zg4hC4")
+                .collection("Child Notes").add(note);
+
+        /*
         notebookRef.add(note)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
@@ -166,11 +171,13 @@ public class MainActivity extends AppCompatActivity {
                         Timber.e("Failure error: " + e.toString());
                     }
                 });
+        */
     }
 
     public void loadNotes(View v) {
 
-        notebookRef.whereEqualTo("tags.tags ", true).get()
+        notebookRef.document("sQXCXVVqoUnHQ8zg4hC4")
+                .collection("Child Notes").get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -384,14 +391,6 @@ public class MainActivity extends AppCompatActivity {
         */
     }
 
-    private void updateArray() {
-       // notebookRef.document("RRHeKf3EzzTcwHhCCDyB")
-         //       .update("tags", FieldValue.arrayUnion("new tag"));
-                //.update("tags", FieldValue.arrayRemove("new tag"));
-
-        //notebookRef.document("sQXCXVVqoUnHQ8zg4hC4")
-          //      .update("tags.tag1.nested1.nested2", true);
-    }
 
 
     Button.OnClickListener btn_save_note__OnClickListener = new View.OnClickListener() {
