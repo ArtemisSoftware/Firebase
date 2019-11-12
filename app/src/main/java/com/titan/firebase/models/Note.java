@@ -2,6 +2,9 @@ package com.titan.firebase.models;
 
 import com.google.firebase.firestore.Exclude;
 
+import java.util.List;
+import java.util.Map;
+
 public class Note {
 
     private String documentId;
@@ -9,14 +12,17 @@ public class Note {
     private String description;
     private int priority;
 
+    Map<String, Boolean> tags;
+
     public Note() {
         //public no-arg constructor needed
     }
 
-    public Note(String title, String description, int priority) {
+    public Note(String title, String description, int priority, Map<String, Boolean> tags) {
         this.title = title;
         this.description = description;
         this.priority = priority;
+        this.tags = tags;
     }
 
     public String getTitle() {
@@ -40,7 +46,7 @@ public class Note {
         return priority;
     }
 
-    public void setPriority(int priority) {
-        this.priority = priority;
+    public Map<String, Boolean> getTags() {
+        return tags;
     }
 }
