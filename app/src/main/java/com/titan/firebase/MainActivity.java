@@ -1,6 +1,7 @@
 package com.titan.firebase;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Transaction;
 import com.google.firebase.firestore.WriteBatch;
 import com.titan.firebase.models.Note;
 
@@ -73,8 +75,8 @@ public class MainActivity extends AppCompatActivity {
         ((Button)findViewById(R.id.btn_add_note)).setOnClickListener(btn_add_note__OnClickListener);
         ((Button)findViewById(R.id.btn_load_notes)).setOnClickListener(btn_load_notes__OnClickListener);
 
-        executeBatchedWrite();
-
+        //executeBatchedWrite();
+        executeTransaction();
     }
 
 
@@ -298,12 +300,34 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Exception e) {
 
-                Timber.d("Error batch: " + e.toString());
+                Timber.e("Error batch: " + e.toString());
                 textViewData.setText(e.toString());
             }
         });
     }
 
+
+    private void executeTransaction() {
+        db.runTransaction(new Transaction.Function<Long>() {
+
+
+            @Override
+            public Long apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
+
+                DocumentReference exampleNoteRef = notebookRef.document("New note");
+
+                DocumentSnapshot exampleNoteSnapshot = transaction.get(exampleNoteRef);
+                long newPriority = exampleNoteSnapshot.getLong("priority") + 1;
+                transaction.update(exampleNoteRef, "priority", newPriority);
+                return newPriority;
+            }
+        }).addOnSuccessListener(new OnSuccessListener<Long>() {
+            @Override
+            public void onSuccess(Long result) {
+                Timber.d("New Priority: " + result);
+            }
+        });
+    }
 
 
     Button.OnClickListener btn_save_note__OnClickListener = new View.OnClickListener() {
