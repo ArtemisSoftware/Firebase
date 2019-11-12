@@ -27,6 +27,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.titan.firebase.models.Note;
 
 import java.util.HashMap;
@@ -72,8 +73,13 @@ public class MainActivity extends AppCompatActivity {
         ((Button)findViewById(R.id.btn_add_note)).setOnClickListener(btn_add_note__OnClickListener);
         ((Button)findViewById(R.id.btn_load_notes)).setOnClickListener(btn_load_notes__OnClickListener);
 
+        executeBatchedWrite();
+
     }
 
+
+
+    /*
     @Override
     protected void onStart() {
         super.onStart();
@@ -118,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-
+*/
 
 
     public void addNote(View v) {
@@ -272,6 +278,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private void executeBatchedWrite() {
+
+        WriteBatch batch = db.batch();
+
+        DocumentReference doc1 = notebookRef.document("New note");
+        batch.set(doc1, new Note("New Note", "New Note", 1));
+
+        DocumentReference doc2 = notebookRef.document("8iULAw5yVBf9E3aV8LXu");
+        batch.update(doc2, "title", "Updated note");
+
+        DocumentReference doc3 = notebookRef.document("4MEJwQknrnTMVMDJvDAH");
+        batch.delete(doc3);
+
+        DocumentReference doc4 = notebookRef.document();
+        batch.set(doc4, new Note("Added Note", "Added Note", 1));
+
+        batch.commit().addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+                Timber.d("Error batch: " + e.toString());
+                textViewData.setText(e.toString());
+            }
+        });
+    }
 
 
 
