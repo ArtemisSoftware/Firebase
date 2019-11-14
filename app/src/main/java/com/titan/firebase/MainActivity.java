@@ -37,15 +37,17 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Transaction;
 import com.google.firebase.firestore.WriteBatch;
 import com.titan.firebase.adapters.NoteAdapter;
+import com.titan.firebase.adapters.OnFirebaseListener;
 import com.titan.firebase.models.Note;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnFirebaseListener {
 
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -78,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                 .setQuery(query, Note.class)
                 .build();
 
-        adapter = new NoteAdapter(options);
+        adapter = new NoteAdapter(options, this);
 
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
@@ -93,8 +95,27 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                adapter.deleteItem(viewHolder.getAdapterPosition());
+            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction) {
+
+                new SweetAlertDialog(MainActivity.this, SweetAlertDialog.WARNING_TYPE)
+                        .setTitleText("Are you sure?")
+                        .setContentText("Won't be able to recover this file!")
+                        .setConfirmText("Yes,delete it!")
+                        .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                            @Override
+                            public void onClick(SweetAlertDialog sDialog) {
+                                sDialog.setTitleText("Deleted!")
+                                        .setContentText("Your file has been deleted!")
+                                        .setConfirmText("OK")
+                                        .setConfirmClickListener(null)
+                                        .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+
+                                adapter.deleteItem(viewHolder.getAdapterPosition());
+                            }
+                        })
+                        .show();
+
+
             }
         }).attachToRecyclerView(recyclerView);
     }
@@ -111,4 +132,16 @@ public class MainActivity extends AppCompatActivity {
         adapter.stopListening();
     }
 
+    @Override
+    public void onItemClick(int position) {
+        if (position != RecyclerView.NO_POSITION) {
+
+            DocumentSnapshot documentSnapshot = adapter.getSnapshots().getSnapshot(position);
+
+            Note note = documentSnapshot.toObject(Note.class);
+            String id = documentSnapshot.getId();
+            String path = documentSnapshot.getReference().getPath();
+            Toast.makeText(MainActivity.this, "Position: " + position + " ID: " + id, Toast.LENGTH_SHORT).show();
+        }
+    }
 }

@@ -13,15 +13,18 @@ import com.titan.firebase.models.Note;
 
 public class NoteAdapter extends FirestoreRecyclerAdapter<Note, NoteHolder> {
 
-    public NoteAdapter(@NonNull FirestoreRecyclerOptions<Note> options) {
+    private OnFirebaseListener listner;
+
+    public NoteAdapter(@NonNull FirestoreRecyclerOptions<Note> options, OnFirebaseListener listner) {
         super(options);
+        this.listner = listner;
     }
 
     @NonNull
     @Override
     public NoteHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.note_item, parent, false);
-        return new NoteHolder(v);
+        return new NoteHolder(v, this.listner);
     }
 
     @Override

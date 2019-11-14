@@ -18,6 +18,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.titan.firebase.models.Note;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 public class NoteActivity extends AppCompatActivity {
 
     private EditText editTextTitle;
@@ -56,7 +58,17 @@ public class NoteActivity extends AppCompatActivity {
             @Override
             public void onSuccess(DocumentReference documentReference) {
                 Toast.makeText(getApplicationContext(), "Note added", Toast.LENGTH_SHORT).show();
-                finish();
+
+                new SweetAlertDialog(NoteActivity.this, SweetAlertDialog.SUCCESS_TYPE)
+                        .setTitleText("Note added")
+                        .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                            @Override
+                            public void onClick(SweetAlertDialog sDialog) {
+                                finish();
+                            }
+                        })
+                        .show();
+
             }
         })
         .addOnFailureListener(this, new OnFailureListener() {
