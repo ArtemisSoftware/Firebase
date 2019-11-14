@@ -31,5 +31,7 @@ public class NoteAdapter extends FirestoreRecyclerAdapter<Note, NoteHolder> {
         holder.textViewPriority.setText(String.valueOf(model.getPriority()));
     }
 
-
+    public void deleteItem(int position) {
+        getSnapshots().getSnapshot(position).getReference().delete();
+    }
 }
