@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -102,9 +103,14 @@ public class ImagesActivity extends AppCompatActivity {
 
                             final String msg = "Image uploaded";
 
-                            Upload upload = new Upload(mEditTextFileName.getText().toString().trim(), taskSnapshot.getUploadSessionUri().toString());
-                            String uploadId = mDatabaseRef.push().getKey();
+                            Task<Uri> urlTask = taskSnapshot.getStorage().getDownloadUrl();
+                            while (!urlTask.isSuccessful());
+                            Uri downloadUrl = urlTask.getResult();
 
+                            Timber.d("onSuccess: firebase download url: " + downloadUrl.toString()); //use if testing...don't need this line.
+                            Upload upload = new Upload(mEditTextFileName.getText().toString().trim(),downloadUrl.toString());
+
+                            String uploadId = mDatabaseRef.push().getKey();
                             mDatabaseRef.child(uploadId).setValue(upload).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
@@ -126,6 +132,7 @@ public class ImagesActivity extends AppCompatActivity {
                                     Timber.d("Sucesso");
                                 }
                             });
+
 
                         }
                     })
@@ -207,7 +214,8 @@ public class ImagesActivity extends AppCompatActivity {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             mImageUri = data.getData();
 
-            Picasso.get().load(mImageUri).into(mImageView);
+            Picasso.with(this).load(mImageUri).into(mImageView);
+            //Picasso.get().load(mImageUri).into(mImageView);
         }
     }
 }
