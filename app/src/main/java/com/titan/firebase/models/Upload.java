@@ -1,9 +1,12 @@
 package com.titan.firebase.models;
 
+import com.google.firebase.firestore.Exclude;
+
 public class Upload {
 
     private String mName;
     private String mImageUrl;
+    private String mKey;
 
     public Upload() {
         //empty constructor needed
@@ -32,5 +35,15 @@ public class Upload {
 
     public void setImageUrl(String imageUrl) {
         mImageUrl = imageUrl;
+    }
+
+    @Exclude
+    public String getKey() {
+        return mKey;
+    }
+
+    @Exclude
+    public void setKey(String mKey) {
+        this.mKey = mKey;
     }
 }
