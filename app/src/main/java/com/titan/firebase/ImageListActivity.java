@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -14,6 +15,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.titan.firebase.adapters.ImageAdapter;
+import com.titan.firebase.adapters.OnImageListener;
 import com.titan.firebase.models.Upload;
 
 import java.util.ArrayList;
@@ -21,7 +23,7 @@ import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class ImageListActivity extends AppCompatActivity {
+public class ImageListActivity extends AppCompatActivity implements OnImageListener {
 
     private RecyclerView mRecyclerView;
     private ImageAdapter mAdapter;
@@ -43,7 +45,6 @@ public class ImageListActivity extends AppCompatActivity {
         mProgressCircle = findViewById(R.id.progress_circle);
 
         mUploads = new ArrayList<>();
-
         mDatabaseRef = FirebaseDatabase.getInstance().getReference("uploads");
 
         mDatabaseRef.addValueEventListener(new ValueEventListener() {
@@ -54,7 +55,7 @@ public class ImageListActivity extends AppCompatActivity {
                     mUploads.add(upload);
                 }
 
-                mAdapter = new ImageAdapter(ImageListActivity.this, mUploads);
+                mAdapter = new ImageAdapter(ImageListActivity.this, mUploads, ImageListActivity.this);
                 mRecyclerView.setAdapter(mAdapter);
                 mProgressCircle.setVisibility(View.INVISIBLE);
             }
@@ -71,5 +72,20 @@ public class ImageListActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        Toast.makeText(this, "Normal click at position: " + position, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onWhatEverClick(int position) {
+        Toast.makeText(this, "Whatever click at position: " + position, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDeleteClick(int position) {
+        Toast.makeText(this, "Delete click at position: " + position, Toast.LENGTH_SHORT).show();
     }
 }
