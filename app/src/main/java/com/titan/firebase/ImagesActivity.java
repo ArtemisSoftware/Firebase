@@ -159,8 +159,11 @@ public class ImagesActivity extends AppCompatActivity {
                     .setContentText("No file selected")
                     .show();
         }
+    }
 
-
+    private void openImagesActivity() {
+        Intent intent = new Intent(this, ImageListActivity.class);
+        startActivity(intent);
     }
 
 
@@ -192,7 +195,7 @@ public class ImagesActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
 
-
+            openImagesActivity();
         }
     };
 
