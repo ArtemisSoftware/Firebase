@@ -15,6 +15,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         (findViewById(R.id.btn_images)).setOnClickListener(btn_images__OnClickListener);
+        (findViewById(R.id.btn_notes)).setOnClickListener(btn_notes__OnClickListener);
     }
 
     Button.OnClickListener btn_images__OnClickListener = new View.OnClickListener() {
@@ -22,6 +23,14 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
 
             startActivity(new Intent(MainActivity.this, ImagesActivity.class));
+        }
+    };
+
+    Button.OnClickListener btn_notes__OnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            startActivity(new Intent(MainActivity.this, NotesActivity.class));
         }
     };
 }

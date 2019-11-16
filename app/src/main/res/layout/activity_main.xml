@@ -1,16 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/btn_images"
+
+    <ImageView
+        android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button"
-        tools:layout_editor_absoluteX="167dp"
-        tools:layout_editor_absoluteY="307dp" />
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="140dp"
+        android:layout_marginRight="16dp"
+        android:src="@drawable/logo"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.github.nikartm.button.FitButton
+        android:id="@+id/btn_notes"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:layout_margin="32dp"
+        android:layout_marginTop="196dp"
+        android:enabled="true"
+        android:gravity="center_vertical"
+        app:fb_backgroundColor="#FF7043"
+        app:fb_cornerRadius="2dp"
+        app:fb_divColor="#fff"
+        app:fb_divHeight="40dp"
+        app:fb_divWidth="1dp"
+        app:fb_icon="@drawable/ic_message"
+        app:fb_iconColor="#FFF"
+        app:fb_iconHeight="28dp"
+        app:fb_iconMarginEnd="16dp"
+        app:fb_iconMarginStart="20dp"
+        app:fb_iconPosition="left"
+        app:fb_iconWidth="28dp"
+        app:fb_rippleColor="#FBE9E7"
+        app:fb_shape="rectangle"
+        app:fb_text="Notes"
+        app:fb_textColor="#FFF"
+        app:fb_textPaddingStart="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.496" />
+
+    <com.github.nikartm.button.FitButton
+        android:id="@+id/btn_images"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:layout_margin="32dp"
+        android:layout_marginTop="196dp"
+        android:enabled="true"
+        android:gravity="center_vertical"
+        app:fb_backgroundColor="#FF7043"
+        app:fb_cornerRadius="2dp"
+        app:fb_divColor="#fff"
+        app:fb_divHeight="40dp"
+        app:fb_divWidth="1dp"
+        app:fb_icon="@drawable/ic_image"
+        app:fb_iconColor="#FFF"
+        app:fb_iconHeight="28dp"
+        app:fb_iconMarginEnd="16dp"
+        app:fb_iconMarginStart="20dp"
+        app:fb_iconPosition="left"
+        app:fb_iconWidth="28dp"
+        app:fb_rippleColor="#FBE9E7"
+        app:fb_shape="rectangle"
+        app:fb_text="Images"
+        app:fb_textColor="#FFF"
+        app:fb_textPaddingStart="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.631" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
