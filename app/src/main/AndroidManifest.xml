@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ImageListActivity"></activity>
+        <activity android:name=".CrashActivity"></activity>
+        <activity android:name=".ImageListActivity" />
         <activity android:name=".NotesActivity" />
         <activity android:name=".ImagesActivity" />
         <activity android:name=".NoteActivity" />
@@ -30,6 +31,9 @@
             </intent-filter>
         </service>
 
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false" />
     </application>
 
 </manifest>

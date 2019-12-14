@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,21 +7,8 @@
     tools:context=".MainActivity">
 
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="140dp"
-        android:layout_marginRight="16dp"
-        android:src="@drawable/logo"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <com.github.nikartm.button.FitButton
-        android:id="@+id/btn_notes"
+        android:id="@+id/btn_fatal_error_1"
         android:layout_width="match_parent"
         android:layout_height="58dp"
         android:layout_margin="32dp"
@@ -43,49 +29,18 @@
         app:fb_iconWidth="28dp"
         app:fb_rippleColor="#FBE9E7"
         app:fb_shape="rectangle"
-        app:fb_text="Notes"
+        app:fb_text="Fatal Error - NullPointerException"
         app:fb_textColor="#FFF"
         app:fb_textPaddingStart="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.75"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.496" />
+        app:layout_constraintVertical_bias="0.633" />
 
     <com.github.nikartm.button.FitButton
-        android:id="@+id/btn_images"
-        android:layout_width="match_parent"
-        android:layout_height="58dp"
-        android:layout_margin="32dp"
-        android:layout_marginTop="196dp"
-        android:enabled="true"
-        android:gravity="center_vertical"
-        app:fb_backgroundColor="#FF7043"
-        app:fb_cornerRadius="2dp"
-        app:fb_divColor="#fff"
-        app:fb_divHeight="40dp"
-        app:fb_divWidth="1dp"
-        app:fb_icon="@drawable/ic_image"
-        app:fb_iconColor="#FFF"
-        app:fb_iconHeight="28dp"
-        app:fb_iconMarginEnd="16dp"
-        app:fb_iconMarginStart="20dp"
-        app:fb_iconPosition="left"
-        app:fb_iconWidth="28dp"
-        app:fb_rippleColor="#FBE9E7"
-        app:fb_shape="rectangle"
-        app:fb_text="Images"
-        app:fb_textColor="#FFF"
-        app:fb_textPaddingStart="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.631" />
-
-
-    <com.github.nikartm.button.FitButton
-        android:id="@+id/btn_crash"
+        android:id="@+id/btn_test_error"
         android:layout_width="match_parent"
         android:layout_height="58dp"
         android:layout_margin="32dp"
@@ -106,14 +61,78 @@
         app:fb_iconWidth="28dp"
         app:fb_rippleColor="#FBE9E7"
         app:fb_shape="rectangle"
-        app:fb_text="Crash test"
+        app:fb_text="Crashlytics test crash"
+        app:fb_textColor="#FFF"
+        app:fb_textPaddingStart="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.75"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.165" />
+
+    <com.github.nikartm.button.FitButton
+        android:id="@+id/btn_fatal_error_2"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:layout_margin="32dp"
+        android:layout_marginTop="196dp"
+        android:enabled="true"
+        android:gravity="center_vertical"
+        app:fb_backgroundColor="#FF7043"
+        app:fb_cornerRadius="2dp"
+        app:fb_divColor="#fff"
+        app:fb_divHeight="40dp"
+        app:fb_divWidth="1dp"
+        app:fb_icon="@drawable/ic_error_black_24dp"
+        app:fb_iconColor="#FFF"
+        app:fb_iconHeight="28dp"
+        app:fb_iconMarginEnd="16dp"
+        app:fb_iconMarginStart="20dp"
+        app:fb_iconPosition="left"
+        app:fb_iconWidth="28dp"
+        app:fb_rippleColor="#FBE9E7"
+        app:fb_shape="rectangle"
+        app:fb_text="Custom Fatal Error - ArrayIndexOutOfBound"
         app:fb_textColor="#FFF"
         app:fb_textPaddingStart="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.767" />
+        app:layout_constraintVertical_bias="0.32" />
+
+    <com.github.nikartm.button.FitButton
+        android:id="@+id/btn_non_fatal_error"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:layout_margin="32dp"
+        android:layout_marginTop="196dp"
+        android:enabled="true"
+        android:gravity="center_vertical"
+        app:fb_backgroundColor="#FF7043"
+        app:fb_cornerRadius="2dp"
+        app:fb_divColor="#fff"
+        app:fb_divHeight="40dp"
+        app:fb_divWidth="1dp"
+        app:fb_icon="@drawable/ic_error_black_24dp"
+        app:fb_iconColor="#FFF"
+        app:fb_iconHeight="28dp"
+        app:fb_iconMarginEnd="16dp"
+        app:fb_iconMarginStart="20dp"
+        app:fb_iconPosition="left"
+        app:fb_iconWidth="28dp"
+        app:fb_rippleColor="#FBE9E7"
+        app:fb_shape="rectangle"
+        app:fb_text="Custom Non-Fatal Error"
+        app:fb_textColor="#FFF"
+        app:fb_textPaddingStart="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.75"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.475" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
