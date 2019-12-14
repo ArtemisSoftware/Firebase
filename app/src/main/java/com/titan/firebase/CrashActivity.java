@@ -24,7 +24,7 @@ public class CrashActivity extends AppCompatActivity {
         (findViewById(R.id.btn_test_error)).setOnClickListener(btn_test_error__OnClickListener);
         (findViewById(R.id.btn_fatal_error_1)).setOnClickListener(btn_fatal_error_1__OnClickListener);
         (findViewById(R.id.btn_fatal_error_2)).setOnClickListener(btn_fatal_error_2__OnClickListener);
-        //(findViewById(R.id.btn_non_fatal_error)).setOnClickListener(btn_non_fatal_error__OnClickListener);
+        (findViewById(R.id.btn_non_fatal_error)).setOnClickListener(btn_non_fatal_error__OnClickListener);
     }
 
     Button.OnClickListener btn_test_error__OnClickListener = new View.OnClickListener() {
@@ -55,6 +55,22 @@ public class CrashActivity extends AppCompatActivity {
         }
     };
 
+    Button.OnClickListener btn_non_fatal_error__OnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
 
+            try {
+                dummyTextView.setText("This will fire NullPointerException");
+            }
+            catch (NullPointerException e) {
+
+                Crashlytics.log("This is a log message: firebase app");
+                Crashlytics.log("This is a log message from the app");
+                Crashlytics.log(e.toString());
+                Crashlytics.logException(e);
+                Toast.makeText(CrashActivity.this, "Custom exception is thrown", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
 
 }
