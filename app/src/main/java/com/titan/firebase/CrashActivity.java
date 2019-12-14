@@ -23,7 +23,7 @@ public class CrashActivity extends AppCompatActivity {
 
         (findViewById(R.id.btn_test_error)).setOnClickListener(btn_test_error__OnClickListener);
         (findViewById(R.id.btn_fatal_error_1)).setOnClickListener(btn_fatal_error_1__OnClickListener);
-        //(findViewById(R.id.btn_fatal_error_2)).setOnClickListener(btn_fatal_error_2__OnClickListener);
+        (findViewById(R.id.btn_fatal_error_2)).setOnClickListener(btn_fatal_error_2__OnClickListener);
         //(findViewById(R.id.btn_non_fatal_error)).setOnClickListener(btn_non_fatal_error__OnClickListener);
     }
 
@@ -45,6 +45,13 @@ public class CrashActivity extends AppCompatActivity {
         public void onClick(View v) {
 
             dummyTextView.setText("This will fire NullPointerException");
+        }
+    };
+
+    Button.OnClickListener btn_fatal_error_2__OnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            throw new ArrayIndexOutOfBoundsException();
         }
     };
 
