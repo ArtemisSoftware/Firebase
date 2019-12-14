@@ -5,6 +5,9 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 
+import com.crashlytics.android.Crashlytics;
+
+import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
 public class App extends Application {
@@ -14,6 +17,16 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        //if (prefs.termsAndConditionsAccepted) {
+
+            Fabric fabric = new Fabric.Builder(this)
+                    .kits(new Crashlytics())
+
+                    .debuggable(BuildConfig.DEBUG) // Enables Crashlytics debugger
+                    .build();
+           Fabric.with(fabric);
+        //}
 
         Timber.plant(new Timber.DebugTree());
 
@@ -33,5 +46,6 @@ public class App extends Application {
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel);
         }
+
     }
 }

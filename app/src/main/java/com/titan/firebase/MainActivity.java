@@ -16,8 +16,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
         (findViewById(R.id.btn_images)).setOnClickListener(btn_images__OnClickListener);
         (findViewById(R.id.btn_notes)).setOnClickListener(btn_notes__OnClickListener);
         (findViewById(R.id.btn_crash)).setOnClickListener(btn_crash__OnClickListener);
@@ -43,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
 
-            Crashlytics.getInstance().crash();
+            startActivity(new Intent(MainActivity.this, CrashActivity.class));
+
         }
     };
 }
